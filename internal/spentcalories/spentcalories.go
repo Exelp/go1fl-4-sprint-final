@@ -20,7 +20,7 @@ func parseTraining(data string) (int, string, time.Duration, error) {
 	// TODO: реализовать функцию
 	parts := strings.Split(data, ",")
 	if len(parts) != 3 {
-		return 0, 0, 0, fmt.Errorf("Недопустимый формат данных")
+		return 0, "", 0, fmt.Errorf("Недопустимый формат данных")
 	}
 	steps, err := strconv.Atoi(strings.TrimSpace(parts[0]))
 	if err != nil {
@@ -58,22 +58,28 @@ func TrainingInfo(data string, weight, height float64) (string, error) {
 		return "", err
 	}
 	if steps <= 0 || weight <= 0 || height <= 0 {
-		return 0, fmt.Errorf("Количество шагов, веса или продолжительности меньше нуля")
+		return "", fmt.Errorf("Количество шагов, веса или продолжительности меньше нуля")
 	}
-	var distance, speed, calories float64
+	var distan, speed, calories float64
 	switch strings.ToLower(activity) {
 	case "Ходьба":
-		distance = distance(steps, height)
+		distan = distance(steps, height)
 		speed = meanSpeed(steps, height, duration)
-		calories = WalkingSpentCalories(steps, weight, height, duration)
+		calories, err = WalkingSpentCalories(steps, weight, height, duration)
+		if err != nil {
+			return "", err
+		}
 	case "Бег":
-		distance = distance(steps, height)
+		distan = distance(steps, height)
 		speed = meanSpeed(steps, height, duration)
-		calories = RunningSpentCalories(steps, weight, height, duration)
+		calories, err = RunningSpentCalories(steps, weight, height, duration)
+		if err != nil {
+			return "", err
+		}
 	default:
 		return "", fmt.Errorf("Неизвестный тип тренировки")
 	}
-	return fmt.Sprintf("Тип тренировки: %s\nДлительность: %.2f ч.\nДистанция: %.2f км.\nСкорость: %.2f км/ч\nСожгли калорий: %.2f", activity, duration.Hours(), distance, speed, calories), nil
+	return fmt.Sprintf("Тип тренировки: %s\nДлительность: %.2f ч.\nДистанция: %.2f км.\nСкорость: %.2f км/ч\nСожгли калорий: %.2f", activity, duration.Hours(), distan, speed, calories), nil
 
 }
 

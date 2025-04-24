@@ -29,7 +29,7 @@ func parsePackage(data string) (int, time.Duration, error) {
 	if steps <= 0 {
 		return 0, 0, fmt.Errorf("Количество шагов меньше нуля")
 	}
-	duration, err := time.ParseDuration(string.TrimSpace(parts[1]))
+	duration, err := time.ParseDuration(strings.TrimSpace(parts[1]))
 	if err != nil {
 		return 0, 0, fmt.Errorf("Ошибка продолжительности")
 	}
