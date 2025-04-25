@@ -2,6 +2,7 @@ package daysteps
 
 import (
 	"fmt"
+	"log"
 	"strconv"
 	"strings"
 	"time"
@@ -22,16 +23,20 @@ func parsePackage(data string) (int, time.Duration, error) {
 	if len(parts) != 2 {
 		return 0, 0, fmt.Errorf("Недопустимый формат даннных")
 	}
+	if strings.Contains(parts[0], " ") {
+		return 0, 0, fmt.Errorf("пробелы в начале/вконце")
+	}
 	steps, err := strconv.Atoi(strings.TrimSpace(parts[0]))
 	if err != nil {
 		return 0, 0, fmt.Errorf("Недопустимый формат шагов")
 	}
-	if steps <= 0 {
-		return 0, 0, fmt.Errorf("Количество шагов меньше нуля")
-	}
+
 	duration, err := time.ParseDuration(strings.TrimSpace(parts[1]))
 	if err != nil {
 		return 0, 0, fmt.Errorf("Ошибка продолжительности")
+	}
+	if steps <= 0 || duration <= 0 {
+		return 0, 0, fmt.Errorf("количество шагов или продолжительности меньше нуля")
 	}
 	return steps, duration, nil
 }
@@ -40,18 +45,19 @@ func DayActionInfo(data string, weight, height float64) string {
 	// TODO: реализовать функцию
 	steps, duration, err := parsePackage(data)
 	if err != nil {
-		fmt.Println("Ошибка", err)
+		log.Println("ошибка", err)
 		return ""
 	}
-	if steps <= 0 {
+	if steps <= 0 || duration <= 0 {
+		log.Println("ошибка: шаги или длительность меньше нуля")
 		return ""
 	}
 	distanceMeters := float64(steps) * stepLength
 	distanceKM := distanceMeters / mInKm
 	calories, err := spentcalories.WalkingSpentCalories(steps, weight, height, duration)
 	if err != nil {
-		fmt.Println("Ошибка подсчета калорий ", err)
+		log.Println("ошибка подсчета калорий ", err)
 		return ""
 	}
-	return fmt.Sprintf("Количество шагов: %d. \nДистанция составила %.2f км.\nВы сожгли %.2f ккал.", steps, distanceKM, calories)
+	return fmt.Sprintf("Количество шагов: %d.\nДистанция составила %.2f км.\nВы сожгли %.2f ккал.\n", steps, distanceKM, calories)
 }
