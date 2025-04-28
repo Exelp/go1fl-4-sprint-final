@@ -21,19 +21,19 @@ func parsePackage(data string) (int, time.Duration, error) {
 	// TODO: реализовать функцию
 	parts := strings.Split(data, ",")
 	if len(parts) != 2 {
-		return 0, 0, fmt.Errorf("Недопустимый формат даннных")
+		return 0, 0, fmt.Errorf("недопустимый формат даннных")
 	}
 	if strings.Contains(parts[0], " ") {
 		return 0, 0, fmt.Errorf("пробелы в начале/вконце")
 	}
 	steps, err := strconv.Atoi(strings.TrimSpace(parts[0]))
 	if err != nil {
-		return 0, 0, fmt.Errorf("Недопустимый формат шагов")
+		return 0, 0, fmt.Errorf("недопустимый формат шагов %w", err)
 	}
 
 	duration, err := time.ParseDuration(strings.TrimSpace(parts[1]))
 	if err != nil {
-		return 0, 0, fmt.Errorf("Ошибка продолжительности")
+		return 0, 0, fmt.Errorf("ошибка продолжительности")
 	}
 	if steps <= 0 || duration <= 0 {
 		return 0, 0, fmt.Errorf("количество шагов или продолжительности меньше нуля")
